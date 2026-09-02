@@ -232,6 +232,7 @@ pub fn run_gui(options: super::RunOptions) -> Result<()> {
             rename_workspace,
             undo_operation,
             write_config_table,
+            open_file,
         ])
         .menu(move |handle| menu::build_main(handle, &recent_workspaces))
         .manage(AppState::new(
@@ -853,6 +854,12 @@ fn undo_operation(
     options: MutationOptions,
 ) -> Result<MutationResult, InvokeError> {
     try_mutate(window, app_state, UndoOperation, options)
+}
+
+#[tauri::command]
+fn open_file(_window: Window, path: String) -> Result<(), InvokeError> {
+    open::that_detached(&path).map_err(InvokeError::from_error)?;
+    Ok(())
 }
 
 #[tauri::command(async)]

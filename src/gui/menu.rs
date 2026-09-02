@@ -284,6 +284,14 @@ pub fn build_context(
         &[
             &MenuItem::with_id(
                 app_handle,
+                "tree_open",
+                "Open in default editor",
+                true,
+                None::<&str>,
+            )?,
+            &PredefinedMenuItem::separator(app_handle)?,
+            &MenuItem::with_id(
+                app_handle,
                 "tree_squash",
                 "Squash into parent",
                 true,
@@ -538,6 +546,8 @@ fn handle_context_main_thread(
                 .expect("session not found")
                 .tree_menu;
 
+            context_menu.enable("tree_open", true)?;
+
             let any_immutable =
                 !ignore_immutable && headers.iter().any(|header| header.is_immutable);
             context_menu.enable(
@@ -681,6 +691,7 @@ pub fn handle_event(window: &Window, event: MenuEvent) -> Result<()> {
         "revision_squash" => window.emit_to(target, "gg://context/revision", "squash")?,
         "revision_restore" => window.emit_to(target, "gg://context/revision", "restore")?,
         "revision_bookmark" => window.emit_to(target, "gg://context/revision", "bookmark")?,
+        "tree_open" => window.emit_to(target, "gg://context/tree", "open")?,
         "tree_squash" => window.emit_to(target, "gg://context/tree", "squash")?,
         "tree_restore" => window.emit_to(target, "gg://context/tree", "restore")?,
         "bookmark_track" => window.emit_to(target, "gg://context/bookmark", "track")?,

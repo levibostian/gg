@@ -132,6 +132,8 @@
         <hr />
         <button disabled={!revisionEnabled.bookmark} on:click={() => onClick("bookmark")}>Create bookmark...</button>
     {:else if operand.type === "Change" && changeEnabled}
+        <button on:click={() => onClick("open")}>Open in default editor</button>
+        <hr />
         <button disabled={!changeEnabled.squash} on:click={() => onClick("squash")}>Squash into parent</button>
         <button disabled={!changeEnabled.restore} on:click={() => onClick("restore")}>Restore from parent</button>
     {:else if operand.type === "Ref" && refEnabled}

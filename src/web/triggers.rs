@@ -15,6 +15,7 @@ pub fn router() -> Router<AppState> {
         .route("/begin_shutdown", post(begin_shutdown))
         .route("/end_shutdown", post(end_shutdown))
         .route("/write_config_table", post(write_config_table))
+        .route("/open_file", post(open_file))
 }
 
 #[derive(Deserialize)]
@@ -60,6 +61,20 @@ async fn write_config_table(
         key: body.key,
         values: body.values,
     }) {
+        Ok(()) => StatusCode::OK,
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
+    }
+}
+
+#[derive(Deserialize)]
+struct OpenFileRequest {
+    #[allow(dead_code)]
+    client_id: String,
+    path: String,
+}
+
+async fn open_file(Json(body): Json<OpenFileRequest>) -> StatusCode {
+    match open::that_detached(&body.path) {
         Ok(()) => StatusCode::OK,
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
     }

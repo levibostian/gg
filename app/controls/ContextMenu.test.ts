@@ -227,4 +227,68 @@ describe("ContextMenu (revert)", () => {
         expect(revertButton).toBeTruthy();
         expect(revertButton!.disabled).toBe(false);
     });
+
+    it("clicking 'Open in default editor' on Change triggers open_file", async () => {
+        let triggerCalls: { cmd: string; args: Record<string, unknown> }[] = [];
+        await cleanupMocks();
+        setupMocks((cmd, args) => {
+            if (cmd === "open_file") {
+                triggerCalls.push({ cmd, args });
+                return undefined;
+            }
+            return undefined;
+        });
+
+        const { default: ContextMenu } = await import("./ContextMenu.svelte");
+        const { repoConfigEvent } = await import("../stores");
+
+        repoConfigEvent.set({
+            type: "Workspace",
+            absolute_path: "/workspace/path",
+            git_remotes: [],
+            query_choices: {},
+            latest_query: "",
+            status: {
+                operation_description: "",
+                working_copy: mockHeader.id.commit,
+            },
+            theme_override: null,
+            mark_unpushed_bookmarks: true,
+            track_recent_workspaces: true,
+            ignore_immutable: false,
+            has_external_diff_tool: false,
+            has_external_merge_tool: false,
+        });
+
+        let onClose = vi.fn();
+        let operand: Operand = {
+            type: "Change",
+            headers: [mockHeader],
+            path: { repo_path: "src/main.rs", relative_path: "src/main.rs" },
+            hunk: null,
+        };
+
+        const { container } = render(ContextMenu, {
+            props: { operand, x: 100, y: 100, onClose },
+        });
+
+        let buttons = container.querySelectorAll("button");
+        let openButton = Array.from(buttons).find(
+            (b) => b.textContent === "Open in default editor",
+        );
+
+        expect(openButton).toBeTruthy();
+        expect(openButton!.disabled).toBe(false);
+
+        openButton!.click();
+
+        expect(onClose).toHaveBeenCalled();
+
+        await vi.waitFor(() => {
+            expect(triggerCalls).toHaveLength(1);
+        });
+
+        expect(triggerCalls[0].cmd).toBe("open_file");
+        expect(triggerCalls[0].args).toEqual({ path: "/workspace/path/src/main.rs" });
+    });
 });

@@ -6,7 +6,9 @@ import type { CopyHunk } from "../messages/CopyHunk";
 import type { MoveChanges } from "../messages/MoveChanges";
 import type { MoveHunk } from "../messages/MoveHunk";
 import type { TreePath } from "../messages/TreePath";
-import { mutate } from "../ipc";
+import { get } from "svelte/store";
+import { mutate, trigger } from "../ipc";
+import { repoConfigEvent } from "../stores";
 
 export type MutationOptions = { ignoreImmutable?: boolean };
 
@@ -37,6 +39,9 @@ export default class ChangeMutator {
         }
 
         switch (event) {
+            case "open":
+                this.onOpen();
+                break;
             case "squash":
                 this.onSquash();
                 break;
@@ -88,5 +93,16 @@ export default class ChangeMutator {
                 paths: [this.#path]
             }, { ignoreImmutable: this.#ignoreImmutable });
         }
+    };
+
+    onOpen = () => {
+        let config = get(repoConfigEvent);
+        if (config.type !== "Workspace") {
+            return;
+        }
+
+        let separator = config.absolute_path.includes("\\") ? "\\" : "/";
+        let fullPath = `${config.absolute_path}${separator}${this.#path.repo_path}`;
+        trigger("open_file", { path: fullPath });
     };
 }
