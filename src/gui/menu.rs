@@ -350,6 +350,14 @@ pub fn build_context(
                 None::<&str>,
             )?,
             &MenuItem::with_id(app_handle, "bookmark_delete", "Delete", true, None::<&str>)?,
+            &PredefinedMenuItem::separator(app_handle)?,
+            &MenuItem::with_id(
+                app_handle,
+                "bookmark_copy_name",
+                "Copy name",
+                true,
+                None::<&str>,
+            )?,
         ],
     )?;
 
@@ -704,6 +712,7 @@ pub fn handle_event(window: &Window, event: MenuEvent) -> Result<()> {
         }
         "bookmark_rename" => window.emit_to(target, "gg://context/bookmark", "rename")?,
         "bookmark_delete" => window.emit_to(target, "gg://context/bookmark", "delete")?,
+        "bookmark_copy_name" => window.emit_to(target, "gg://context/bookmark", "copy-name")?,
         "workspace_open" => window.emit_to(target, "gg://context/workspace", "open")?,
         "workspace_forget" => window.emit_to(target, "gg://context/workspace", "forget")?,
         "workspace_rename" => window.emit_to(target, "gg://context/workspace", "rename")?,

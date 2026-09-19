@@ -79,6 +79,10 @@ export default class RefMutator {
                 this.onDelete();
                 break;
 
+            case "copy-name":
+                this.onCopyName();
+                break;
+
             default:
                 console.log(`unimplemented mutation '${event}'`, this);
         }
@@ -112,6 +116,11 @@ export default class RefMutator {
         mutate<DeleteRef>("delete_ref", {
             ref: this.#ref
         }, options);
+    };
+
+    onCopyName = () => {
+        let name = this.#ref.type === "Tag" ? this.#ref.tag_name : this.#ref.bookmark_name;
+        navigator.clipboard.writeText(name);
     };
 
     onPushAll = (options?: MutationOptions) => {

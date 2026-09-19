@@ -154,6 +154,8 @@
         <hr />
         <button disabled={!refEnabled.rename} on:click={() => onClick("rename")}>Rename...</button>
         <button disabled={!refEnabled.delete} on:click={() => onClick("delete")}>Delete</button>
+        <hr />
+        <button on:click={() => onClick("copy-name")}>Copy name</button>
     {:else if operand.type === "Workspace"}
         <button class="defaulted" on:click={() => onClick("open")}>Open</button>
         <button on:click={() => onClick("forget")}>Forget</button>
